@@ -1,0 +1,6 @@
+# Ignorar la carpeta .certs
+certs/
+
+# Ignorar todos los archivos .env
+.env*
+*.env*

@@ -1,0 +1,53 @@
+services:
+    apache:
+        build: apache-php-lamp
+        ports:
+            - "80:80"
+            - "443:443"
+        env_file:
+            - .env.dev
+        volumes:
+            - ./prestashop_8.2.1:/app
+            - ./apache-php-lamp/vhost-apache.conf:/etc/apache2/sites-enabled/vhost-apache.conf
+            #php.ini
+            - ./certs:/certs
+        networks:
+            redelamplemp:
+                aliases:
+                    - tarefabruno.lan
+                    - www.tarefabruno.lan
+    basededatos:
+        image: mysql:latest
+        env_file:
+            - .env.dev
+        volumes:
+            - datos:/var/lib/mysql
+            - ./basededatos:/backup
+            - ./basededatos:/docker-entrypoint-initdb.d
+        networks:
+            redelamplemp:
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        ports:
+            - "8080:80"
+        environment:
+            PMA_HOST: basededatos
+        networks:
+            - redelamplemp
+
+    cliente:
+        hostname: cliente
+        image: brunosct/debian12-cliente-firefox
+        networks:
+            - redelamplemp
+        environment:
+            - DISPLAY=:0
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+volumes:
+    datos:
+
+networks:
+    redelamplemp:
